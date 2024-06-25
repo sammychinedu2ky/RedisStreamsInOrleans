@@ -11,7 +11,7 @@ namespace Provider
 {
     public class RedisStreamFailureHandler : IStreamFailureHandler
     {
-        private  ILogger<RedisStreamFailureHandler> _logger;
+        private readonly ILogger<RedisStreamFailureHandler> _logger;
 
         public RedisStreamFailureHandler(ILogger<RedisStreamFailureHandler> logger)
         {
