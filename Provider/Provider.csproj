@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Orleans.Streaming" Version="8.1.0" />
+	<PackageReference Include="Microsoft.Orleans.Sdk" Version="8.1.0" />
     <PackageReference Include="StackExchange.Redis" Version="2.7.33" />
   </ItemGroup>
 

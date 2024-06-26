@@ -1,11 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Orleans.Streams;
 using StackExchange.Redis;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Provider
 {
@@ -16,23 +12,23 @@ namespace Provider
         private readonly ILogger<RedisStreamReceiver> _logger;
         private bool _checkBacklog = true;
         private string _lastId = "0";
+        private Task? pendingTasks;
 
-        public RedisStreamReceiver(QueueId queueId, IDatabase database, Microsoft.Extensions.Logging.ILogger<RedisStreamReceiver> logger)
+        public RedisStreamReceiver(QueueId queueId, IDatabase database, ILogger<RedisStreamReceiver> logger)
         {
             _queueId = queueId;
             _database = database;
             _logger = logger;
         }
 
-        public async Task<IList<IBatchContainer>> GetQueueMessagesAsync(int maxCount)
+        public async Task<IList<IBatchContainer>?> GetQueueMessagesAsync(int maxCount)
         {
             try
             {
-                if (_checkBacklog) maxCount = 0;
-                var events = await _database.StreamReadGroupAsync(_queueId.ToString(), "consumer", _queueId.ToString(), _lastId, maxCount);
+                var events = _database.StreamReadGroupAsync(_queueId.ToString(), "consumer", _queueId.ToString(), _lastId, maxCount);
+                pendingTasks = events;
                 _lastId = ">";
-                _checkBacklog = false;
-                var batches = events.Select(e => new RedisStreamBatchContainer(e)).ToList<IBatchContainer>();
+                var batches = (await events).Select(e => new RedisStreamBatchContainer(e)).ToList<IBatchContainer>();
                 return batches;
             }
             catch (Exception ex)
@@ -40,6 +36,11 @@ namespace Provider
                 _logger.LogError(ex, "Error reading from stream {QueueId}", _queueId);
                 return default;
             }
+            finally
+            {
+                pendingTasks = null;
+            }
+
 
         }
 
@@ -50,7 +51,7 @@ namespace Provider
                 using (var cts = new CancellationTokenSource(timeout))
                 {
                     var task = _database.StreamCreateConsumerGroupAsync(_queueId.ToString(), "consumer", "$", true);
-                    await task.WaitAsync(timeout, cts.Token);                    
+                    await task.WaitAsync(timeout, cts.Token);
                 }
             }
             catch (Exception ex) when (ex.Message.Contains("name already exists")) { }
@@ -69,7 +70,9 @@ namespace Provider
                     var container = message as RedisStreamBatchContainer;
                     if (container != null)
                     {
-                        await _database.StreamAcknowledgeAsync(_queueId.ToString(), "consumer", container.StreamEntry.Id);
+                        var ack = _database.StreamAcknowledgeAsync(_queueId.ToString(), "consumer", container.StreamEntry.Id);
+                        pendingTasks = ack;
+                        await ack;
                     }
                 }
             }
@@ -77,11 +80,23 @@ namespace Provider
             {
                 _logger.LogError(ex, "Error acknowledging messages in stream {QueueId}", _queueId);
             }
+            finally
+            {
+                pendingTasks = null;
+            }
         }
 
-        public Task Shutdown(TimeSpan timeout)
+        public async Task Shutdown(TimeSpan timeout)
         {
-            // implement any shut
+            using (var cts = new CancellationTokenSource(timeout))
+            {
+
+                if (pendingTasks is not null)
+                {
+                    await pendingTasks.WaitAsync(timeout, cts.Token);
+                }
+            }
+            _logger.LogInformation("Shutting down stream {QueueId}", _queueId);
         }
     }
 }

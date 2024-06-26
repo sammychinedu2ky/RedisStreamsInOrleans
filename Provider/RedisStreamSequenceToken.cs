@@ -13,9 +13,9 @@ namespace Provider
     internal class RedisStreamSequenceToken : StreamSequenceToken
     {
         [Id(0)]
-        public override long SequenceNumber { get => throw new NotImplementedException(); protected set => throw new NotImplementedException(); }
+        public override long SequenceNumber { get; protected set; }
         [Id(1)]
-        public override int EventIndex { get => throw new NotImplementedException(); protected set => throw new NotImplementedException(); }
+        public override int EventIndex { get ; protected set ; }
 
         public RedisStreamSequenceToken(RedisValue id)
         {

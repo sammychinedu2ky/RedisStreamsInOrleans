@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Orleans;
 using Orleans.Configuration;
 using Orleans.Providers.Streams.Common;
 using Orleans.Streams;
@@ -30,9 +32,21 @@ namespace Provider
             _simpleQueueCacheOptions = simpleQueueCacheOptions;
             _hashRingBasedStreamQueueMapper = new HashRingBasedStreamQueueMapper(hashRingStreamQueueMapperOptions, providerName);
         }
+
+        public static IQueueAdapterFactory Create(IServiceProvider provider, string providerName)
+        {
+            var database = provider.GetRequiredService<IDatabase>();
+            var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
+            var simpleQueueCacheOptions = provider.GetOptionsByName<SimpleQueueCacheOptions>(providerName);
+            var hashRingStreamQueueMapperOptions = provider.GetOptionsByName<HashRingStreamQueueMapperOptions>(providerName);
+            var streamFailureHandler = new RedisStreamFailureHandler(loggerFactory.CreateLogger<RedisStreamFailureHandler>());
+            return new RedisStreamFactory(database, loggerFactory, providerName, streamFailureHandler, simpleQueueCacheOptions, hashRingStreamQueueMapperOptions);
+
+        }
+
         public Task<IQueueAdapter> CreateAdapter()
         {
-            return Task.FromResult<IQueueAdapter>(new RedisStreamAdapter(_database, _providerName, _hashRingBasedStreamQueueMapper, _loggerFactory);
+            return Task.FromResult<IQueueAdapter>(new RedisStreamAdapter(_database, _providerName, _hashRingBasedStreamQueueMapper, _loggerFactory));
         }
 
         public Task<IStreamFailureHandler> GetDeliveryFailureHandler(QueueId queueId)
