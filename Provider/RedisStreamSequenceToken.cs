@@ -1,11 +1,5 @@
-﻿using Orleans;
-using Orleans.Streams;
+﻿using Orleans.Streams;
 using StackExchange.Redis;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Provider
 {
@@ -15,7 +9,7 @@ namespace Provider
         [Id(0)]
         public override long SequenceNumber { get; protected set; }
         [Id(1)]
-        public override int EventIndex { get ; protected set ; }
+        public override int EventIndex { get; protected set; }
 
         public RedisStreamSequenceToken(RedisValue id)
         {
@@ -31,10 +25,10 @@ namespace Provider
         }
         public override int CompareTo(StreamSequenceToken other)
         {
-            if(other is null) throw new ArgumentNullException(nameof(other));
-            if(other is RedisStreamSequenceToken token)
+            if (other is null) throw new ArgumentNullException(nameof(other));
+            if (other is RedisStreamSequenceToken token)
             {
-                if(SequenceNumber == token.SequenceNumber)
+                if (SequenceNumber == token.SequenceNumber)
                 {
                     return EventIndex.CompareTo(token.EventIndex);
                 }

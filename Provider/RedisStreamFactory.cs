@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Orleans;
 using Orleans.Configuration;
 using Orleans.Providers.Streams.Common;
 using Orleans.Streams;
@@ -56,7 +55,7 @@ namespace Provider
 
         public IQueueAdapterCache GetQueueAdapterCache()
         {
-            return new SimpleQueueAdapterCache(_simpleQueueCacheOptions,_providerName, _loggerFactory);
+            return new SimpleQueueAdapterCache(_simpleQueueCacheOptions, _providerName, _loggerFactory);
         }
 
         public IStreamQueueMapper GetStreamQueueMapper()

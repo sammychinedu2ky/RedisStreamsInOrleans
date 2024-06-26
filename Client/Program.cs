@@ -1,5 +1,4 @@
-﻿using Microsoft.CodeAnalysis.Operations;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Orleans.Configuration;
@@ -46,7 +45,7 @@ var task = Task.Run(async () =>
     {
         logger.LogInformation("Sending number {Number}", num);
         await stream.OnNextAsync(num++);
-        
+
         if (num == 20)
         {
             break;
