@@ -6,7 +6,7 @@ using System.Text.Json;
 
 namespace Provider
 {
-    internal class RedisStreamAdapter : IQueueAdapter
+    public class RedisStreamAdapter : IQueueAdapter
     {
         private readonly IDatabase _database;
         private readonly string _providerName;

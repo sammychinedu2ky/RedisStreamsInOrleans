@@ -4,7 +4,7 @@ using StackExchange.Redis;
 namespace Provider
 {
     [GenerateSerializer]
-    internal class RedisStreamSequenceToken : StreamSequenceToken
+    public class RedisStreamSequenceToken : StreamSequenceToken
     {
         [Id(0)]
         public override long SequenceNumber { get; protected set; }

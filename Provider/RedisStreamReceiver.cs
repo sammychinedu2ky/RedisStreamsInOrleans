@@ -5,7 +5,7 @@ using StackExchange.Redis;
 
 namespace Provider
 {
-    internal class RedisStreamReceiver : IQueueAdapterReceiver
+    public class RedisStreamReceiver : IQueueAdapterReceiver
     {
         private readonly QueueId _queueId;
         private readonly IDatabase _database;
