@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.CodeAnalysis.Operations;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Orleans.Configuration;
@@ -27,8 +28,8 @@ using IHost host = new HostBuilder()
 
          });
      })
+     .ConfigureLogging(logging => logging.AddConsole())
      .Build();
-
 await host.StartAsync();
 
 IClusterClient client = host.Services.GetRequiredService<IClusterClient>();
@@ -44,39 +45,15 @@ var task = Task.Run(async () =>
     while (true)
     {
         logger.LogInformation("Sending number {Number}", num);
-        Console.WriteLine("Sending number {0}", num);
-        //await stream.OnNextAsync(num++);
-        await stream.OnCompletedAsync();
+        await stream.OnNextAsync(num++);
+        
         if (num == 20)
         {
             break;
         }
         await Task.Delay(1000);
     }
-    await stream.OnCompletedAsync();
 });
 
-var streamId2 = StreamId.Create("stringgenerator", "random");
-var stream2 = streamProvider.GetStream<string>(streamId2);
-List<string> strings = new() { "one", "two", "three", "four", "five" };
 
-var task2 = Task.Run(async () =>
-{
-    var num = 0;
-    while (true)
-    {
-        var str = strings[num % strings.Count];
-        logger.LogInformation("Sending string {String}", str);
-        Console.WriteLine("Sending string {0}", str);
-       await stream2.OnNextAsync(str);
-        num++;
-        if (num == 10)
-        {
-            break;
-        }
-
-    }
-    await stream2.OnCompletedAsync();
-    Console.WriteLine("Stream completed");
-});
 Console.ReadLine();
