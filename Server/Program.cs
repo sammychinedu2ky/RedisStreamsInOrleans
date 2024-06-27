@@ -13,11 +13,6 @@ var builder = new HostBuilder()
         silo.Services.AddSingleton<IDatabase>(sp =>
         {
             return ConnectionMultiplexer.Connect("localhost").GetDatabase();
-        })
-        .Configure<GrainCollectionOptions>(options =>
-        {
-            options.CollectionQuantum = TimeSpan.FromSeconds(5);
-            options.CollectionAge = TimeSpan.FromSeconds(15);
         });
         silo.ConfigureLogging(logging => logging.AddConsole());
         silo.AddMemoryGrainStorage("PubSubStore");
