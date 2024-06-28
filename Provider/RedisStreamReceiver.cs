@@ -10,7 +10,6 @@ namespace Provider
         private readonly QueueId _queueId;
         private readonly IDatabase _database;
         private readonly ILogger<RedisStreamReceiver> _logger;
-        private bool _checkBacklog = true;
         private string _lastId = "0";
         private Task? pendingTasks;
 
