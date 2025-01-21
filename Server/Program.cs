@@ -2,9 +2,9 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Orleans.Configuration;
-using Orleans.Runtime;
 using Orleans.Streams;
 using StackExchange.Redis;
+using Universley.OrleansContrib.StreamsProvider.Redis;
 
 var builder = new HostBuilder()
     .UseOrleans(silo =>
@@ -16,7 +16,7 @@ var builder = new HostBuilder()
         });
         silo.ConfigureLogging(logging => logging.AddConsole());
         silo.AddMemoryGrainStorage("PubSubStore");
-        silo.AddPersistentStreams("RedisStream", Provider.RedisStreamFactory.Create, null);
+        silo.AddPersistentStreams("RedisStream", RedisStreamFactory.Create, null);
         silo.AddMemoryGrainStorageAsDefault();
     }).UseConsoleLifetime();
 builder.ConfigureServices(services =>

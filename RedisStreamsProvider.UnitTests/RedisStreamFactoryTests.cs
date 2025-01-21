@@ -1,12 +1,10 @@
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Orleans.Configuration;
 using Orleans.Providers.Streams.Common;
 using Orleans.Streams;
-using Provider;
 using StackExchange.Redis;
-using Xunit;
+using Universley.OrleansContrib.StreamsProvider.Redis;
 
 namespace RedisStreamsProvider.UnitTests
 {

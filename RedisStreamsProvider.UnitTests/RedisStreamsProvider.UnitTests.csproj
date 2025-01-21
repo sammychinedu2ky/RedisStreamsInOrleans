@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Provider\Provider.csproj" />
+    <ProjectReference Include="..\Provider\Universley.OrleansContrib.StreamsProvider.Redis.csproj" />
   </ItemGroup>
 
   <ItemGroup>

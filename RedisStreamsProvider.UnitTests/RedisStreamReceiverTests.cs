@@ -1,12 +1,8 @@
 using Microsoft.Extensions.Logging;
 using Moq;
 using Orleans.Streams;
-using Provider;
 using StackExchange.Redis;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Xunit;
+using Universley.OrleansContrib.StreamsProvider.Redis;
 
 namespace RedisStreamsProvider.UnitTests
 {

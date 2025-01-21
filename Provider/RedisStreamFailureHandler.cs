@@ -1,8 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
-using Orleans.Runtime;
 using Orleans.Streams;
 
-namespace Provider
+namespace Universley.OrleansContrib.StreamsProvider.Redis
 {
     public class RedisStreamFailureHandler : IStreamFailureHandler
     {

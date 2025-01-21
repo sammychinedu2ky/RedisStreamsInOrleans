@@ -2,9 +2,8 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Orleans.Configuration;
-using Orleans.Runtime;
-using Provider;
 using StackExchange.Redis;
+using Universley.OrleansContrib.StreamsProvider.Redis;
 
 using IHost host = new HostBuilder()
      .UseOrleansClient(clientBuilder =>

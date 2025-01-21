@@ -1,7 +1,7 @@
 ﻿using Orleans.Streams;
 using StackExchange.Redis;
 
-namespace Provider
+namespace Universley.OrleansContrib.StreamsProvider.Redis
 {
     [GenerateSerializer]
     public class RedisStreamSequenceToken : StreamSequenceToken

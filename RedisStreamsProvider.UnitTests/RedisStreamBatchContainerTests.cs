@@ -1,7 +1,6 @@
-using Provider;
 using StackExchange.Redis;
 using System.Text.Json;
-using Xunit;
+using Universley.OrleansContrib.StreamsProvider.Redis;
 
 namespace RedisStreamsProvider.UnitTests
 {

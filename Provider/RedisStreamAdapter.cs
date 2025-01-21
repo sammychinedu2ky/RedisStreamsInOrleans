@@ -1,10 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
-using Orleans.Runtime;
 using Orleans.Streams;
 using StackExchange.Redis;
 using System.Text.Json;
 
-namespace Provider
+namespace Universley.OrleansContrib.StreamsProvider.Redis
 {
     public class RedisStreamAdapter : IQueueAdapter
     {

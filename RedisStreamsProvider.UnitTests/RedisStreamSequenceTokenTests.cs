@@ -1,9 +1,7 @@
-﻿using Xunit;
-using StackExchange.Redis;
-using Provider;
+﻿using StackExchange.Redis;
 using Orleans.Streams;
-using System;
 using Moq;
+using Universley.OrleansContrib.StreamsProvider.Redis;
 
 namespace Provider.Tests
 {

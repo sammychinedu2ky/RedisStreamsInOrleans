@@ -5,7 +5,7 @@ using Orleans.Providers.Streams.Common;
 using Orleans.Streams;
 using StackExchange.Redis;
 
-namespace Provider
+namespace Universley.OrleansContrib.StreamsProvider.Redis
 {
     public class RedisStreamFactory : IQueueAdapterFactory
     {
