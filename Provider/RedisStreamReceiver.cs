@@ -16,8 +16,8 @@ namespace Provider
         public RedisStreamReceiver(QueueId queueId, IDatabase database, ILogger<RedisStreamReceiver> logger)
         {
             _queueId = queueId;
-            _database = database;
-            _logger = logger;
+            _database = database ?? throw new ArgumentNullException(nameof(database));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<IList<IBatchContainer>?> GetQueueMessagesAsync(int maxCount)

@@ -16,10 +16,10 @@ namespace Provider
 
         public RedisStreamAdapter(IDatabase database, string providerName, HashRingBasedStreamQueueMapper hashRingBasedStreamQueueMapper, ILoggerFactory loggerFactory)
         {
-            _database = database;
-            _providerName = providerName;
-            _hashRingBasedStreamQueueMapper = hashRingBasedStreamQueueMapper;
-            _loggerFactory = loggerFactory;
+            _database = database ?? throw new ArgumentNullException(nameof(database));
+            _providerName = providerName ?? throw new ArgumentNullException(nameof(providerName));
+            _hashRingBasedStreamQueueMapper = hashRingBasedStreamQueueMapper ?? throw new ArgumentNullException(nameof(hashRingBasedStreamQueueMapper));
+            _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
             _logger = loggerFactory.CreateLogger<RedisStreamAdapter>();
         }
 

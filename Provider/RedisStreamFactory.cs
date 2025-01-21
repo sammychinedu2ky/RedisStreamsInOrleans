@@ -24,11 +24,16 @@ namespace Provider
             HashRingStreamQueueMapperOptions hashRingStreamQueueMapperOptions
             )
         {
-            _connectionMultiplexer = connectionMultiplexer;
-            _loggerFactory = loggerFactory;
-            _providerName = providerName;
-            _streamFailureHandler = streamFailureHandler;
-            _simpleQueueCacheOptions = simpleQueueCacheOptions;
+            if (hashRingStreamQueueMapperOptions is null)
+            {
+                throw new ArgumentNullException(nameof(hashRingStreamQueueMapperOptions));
+            }
+
+            _connectionMultiplexer = connectionMultiplexer ?? throw new ArgumentNullException(nameof(connectionMultiplexer));
+            _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
+            _providerName = providerName ?? throw new ArgumentNullException(nameof(providerName));
+            _streamFailureHandler = streamFailureHandler ?? throw new ArgumentNullException(nameof(streamFailureHandler));
+            _simpleQueueCacheOptions = simpleQueueCacheOptions ?? throw new ArgumentNullException(nameof(simpleQueueCacheOptions));
             _hashRingBasedStreamQueueMapper = new HashRingBasedStreamQueueMapper(hashRingStreamQueueMapperOptions, providerName);
         }
 
