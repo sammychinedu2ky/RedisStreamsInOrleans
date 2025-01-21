@@ -9,14 +9,14 @@ namespace Provider
 {
     public class RedisStreamFactory : IQueueAdapterFactory
     {
-        private readonly IDatabase _database;
+        private readonly IConnectionMultiplexer _connectionMultiplexer;
         private readonly ILoggerFactory _loggerFactory;
         private readonly string _providerName;
         private readonly IStreamFailureHandler _streamFailureHandler;
         private readonly SimpleQueueCacheOptions _simpleQueueCacheOptions;
         private readonly HashRingBasedStreamQueueMapper _hashRingBasedStreamQueueMapper;
 
-        public RedisStreamFactory(IDatabase database,
+        public RedisStreamFactory(IConnectionMultiplexer connectionMultiplexer,
             ILoggerFactory loggerFactory,
             string providerName,
             IStreamFailureHandler streamFailureHandler,
@@ -24,7 +24,7 @@ namespace Provider
             HashRingStreamQueueMapperOptions hashRingStreamQueueMapperOptions
             )
         {
-            _database = database;
+            _connectionMultiplexer = connectionMultiplexer;
             _loggerFactory = loggerFactory;
             _providerName = providerName;
             _streamFailureHandler = streamFailureHandler;
@@ -34,18 +34,18 @@ namespace Provider
 
         public static IQueueAdapterFactory Create(IServiceProvider provider, string providerName)
         {
-            var database = provider.GetRequiredService<IDatabase>();
+            var connMuliplexer = provider.GetRequiredService<IConnectionMultiplexer>();
             var loggerFactory = provider.GetRequiredService<ILoggerFactory>();
             var simpleQueueCacheOptions = provider.GetOptionsByName<SimpleQueueCacheOptions>(providerName);
             var hashRingStreamQueueMapperOptions = provider.GetOptionsByName<HashRingStreamQueueMapperOptions>(providerName);
             var streamFailureHandler = new RedisStreamFailureHandler(loggerFactory.CreateLogger<RedisStreamFailureHandler>());
-            return new RedisStreamFactory(database, loggerFactory, providerName, streamFailureHandler, simpleQueueCacheOptions, hashRingStreamQueueMapperOptions);
+            return new RedisStreamFactory(connMuliplexer, loggerFactory, providerName, streamFailureHandler, simpleQueueCacheOptions, hashRingStreamQueueMapperOptions);
 
         }
 
         public Task<IQueueAdapter> CreateAdapter()
         {
-            return Task.FromResult<IQueueAdapter>(new RedisStreamAdapter(_database, _providerName, _hashRingBasedStreamQueueMapper, _loggerFactory));
+            return Task.FromResult<IQueueAdapter>(new RedisStreamAdapter(_connectionMultiplexer.GetDatabase(), _providerName, _hashRingBasedStreamQueueMapper, _loggerFactory));
         }
 
         public Task<IStreamFailureHandler> GetDeliveryFailureHandler(QueueId queueId)

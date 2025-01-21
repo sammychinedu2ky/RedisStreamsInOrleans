@@ -10,9 +10,9 @@ var builder = new HostBuilder()
     .UseOrleans(silo =>
     {
         silo.UseLocalhostClustering();
-        silo.Services.AddSingleton<IDatabase>(sp =>
+        silo.Services.AddSingleton<IConnectionMultiplexer>(sp =>
         {
-            return ConnectionMultiplexer.Connect("localhost").GetDatabase();
+            return ConnectionMultiplexer.Connect("localhost");
         });
         silo.ConfigureLogging(logging => logging.AddConsole());
         silo.AddMemoryGrainStorage("PubSubStore");

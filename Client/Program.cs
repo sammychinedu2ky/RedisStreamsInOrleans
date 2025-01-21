@@ -9,10 +9,9 @@ using StackExchange.Redis;
 using IHost host = new HostBuilder()
      .UseOrleansClient(clientBuilder =>
      {
-         clientBuilder.Services.AddSingleton<IDatabase>(sp =>
+         clientBuilder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
          {
-             IDatabase db = ConnectionMultiplexer.Connect("localhost").GetDatabase();
-             return db;
+             return ConnectionMultiplexer.Connect("localhost");
          });
          clientBuilder.UseLocalhostClustering();
 
