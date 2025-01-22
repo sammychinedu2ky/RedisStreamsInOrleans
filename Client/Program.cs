@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Orleans.Configuration;
+using Orleans.Streams;
 using StackExchange.Redis;
 using Universley.OrleansContrib.StreamsProvider.Redis;
 
@@ -35,6 +36,15 @@ var streamProvider = client.GetStreamProvider("RedisStream");
 
 var streamId = StreamId.Create("numbergenerator", "consecutive");
 var stream = streamProvider.GetStream<int>(streamId);
+
+var newStreamId = StreamId.Create("numbergenerator", "consecutive-back");
+var newStream = streamProvider.GetStream<int>(newStreamId);
+
+await stream.SubscribeAsync((i, token) =>
+{
+    logger.LogInformation("Received back number {Number}", i);
+    return Task.CompletedTask;
+});
 
 var task = Task.Run(async () =>
 {

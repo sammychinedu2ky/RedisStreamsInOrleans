@@ -1,9 +1,9 @@
-﻿using StackExchange.Redis;
+﻿using Moq;
 using Orleans.Streams;
-using Moq;
+using StackExchange.Redis;
 using Universley.OrleansContrib.StreamsProvider.Redis;
 
-namespace Provider.Tests
+namespace RedisStreamsProvider.UnitTests
 {
     public class RedisStreamSequenceTokenTests
     {

@@ -69,7 +69,7 @@ namespace Universley.OrleansContrib.StreamsProvider.Redis
                     var container = message as RedisStreamBatchContainer;
                     if (container != null)
                     {
-                        var ack = _database.StreamAcknowledgeAsync(_queueId.ToString(), "consumer", container.StreamEntry.Id);
+                        var ack = _database.StreamAcknowledgeAsync(_queueId.ToString(), "consumer", container.StreamEntryId);
                         pendingTasks = ack;
                         await ack;
                     }

@@ -7,9 +7,9 @@ namespace Universley.OrleansContrib.StreamsProvider.Redis
     public class RedisStreamSequenceToken : StreamSequenceToken
     {
         [Id(0)]
-        public override long SequenceNumber { get; protected set; }
+        public sealed override long SequenceNumber { get; protected set; }
         [Id(1)]
-        public override int EventIndex { get; protected set; }
+        public sealed override int EventIndex { get; protected set; }
 
         public RedisStreamSequenceToken(RedisValue id)
         {
@@ -37,7 +37,7 @@ namespace Universley.OrleansContrib.StreamsProvider.Redis
             throw new ArgumentException("Invalid token type", nameof(other));
         }
 
-        public override bool Equals(StreamSequenceToken other)
+        public override bool Equals(StreamSequenceToken? other)
         {
             var token = other as RedisStreamSequenceToken;
             return token != null && SequenceNumber == token.SequenceNumber && EventIndex == token.EventIndex;

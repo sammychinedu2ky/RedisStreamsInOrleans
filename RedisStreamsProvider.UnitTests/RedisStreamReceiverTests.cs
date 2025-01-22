@@ -27,15 +27,23 @@ namespace RedisStreamsProvider.UnitTests
             // Arrange
             var streamEntries = new[]
             {
-                new StreamEntry("1-0", new NameValueEntry[2] {new NameValueEntry("namespace", "testNamespace"),
-                        new NameValueEntry("key", "testKey")}),
-                new StreamEntry("2-0", new NameValueEntry[2] {new NameValueEntry("namespace", "testNamespace"),
-                        new NameValueEntry("key", "testKey")})
+                new StreamEntry("1-0", [
+                    new("namespace", "testNamespace"),
+                    new("key", "testKey"),
+                    new("eventType", "testEventType" ),
+                    new( "data", "testData" )
+                ]),
+                new StreamEntry("2-0", [
+                    new("namespace", "testNamespace"),
+                    new("key", "testKey"),
+                    new("eventType", "testEventType" ),
+                    new( "data", "testData" )
+                ])
             };
             _mockDatabase.Setup(db => db.StreamReadGroupAsync(
-                It.IsAny<RedisKey>(), It.IsAny<RedisValue>(), It.IsAny<RedisValue>(), It.IsAny<RedisValue?>(),
-                It.IsAny<int?>(), It.IsAny<bool>(), CommandFlags.None))
-                         .ReturnsAsync(streamEntries);
+                    It.IsAny<RedisKey>(), It.IsAny<RedisValue>(), It.IsAny<RedisValue>(), It.IsAny<RedisValue?>(),
+                    It.IsAny<int?>(), It.IsAny<bool>(), CommandFlags.None))
+                .ReturnsAsync(streamEntries);
 
             // Act
             var result = await _receiver.GetQueueMessagesAsync(10);
@@ -49,14 +57,17 @@ namespace RedisStreamsProvider.UnitTests
         public async Task Initialize_CreatesConsumerGroup()
         {
             // Arrange
-            _mockDatabase.Setup(db => db.StreamCreateConsumerGroupAsync(It.IsAny<RedisKey>(), It.IsAny<RedisValue>(), It.IsAny<RedisValue>(), It.IsAny<bool>(), CommandFlags.None))
-                         .ReturnsAsync(true);
+            _mockDatabase.Setup(db => db.StreamCreateConsumerGroupAsync(It.IsAny<RedisKey>(), It.IsAny<RedisValue>(),
+                    It.IsAny<RedisValue>(), It.IsAny<bool>(), CommandFlags.None))
+                .ReturnsAsync(true);
 
             // Act
             await _receiver.Initialize(TimeSpan.FromSeconds(5));
 
             // Assert
-            _mockDatabase.Verify(db => db.StreamCreateConsumerGroupAsync(_queueId.ToString(), "consumer", "$", true, CommandFlags.None), Times.Once);
+            _mockDatabase.Verify(
+                db => db.StreamCreateConsumerGroupAsync(_queueId.ToString(), "consumer", "$", true, CommandFlags.None),
+                Times.Once);
         }
 
         [Fact]
@@ -65,20 +76,31 @@ namespace RedisStreamsProvider.UnitTests
             // Arrange
             var messages = new List<IBatchContainer>
             {
-                new RedisStreamBatchContainer(new StreamEntry("1-0", new NameValueEntry[2] {new NameValueEntry("namespace", "testNamespace"),
-                        new NameValueEntry("key", "testKey")})),
-                new RedisStreamBatchContainer(new StreamEntry("2-0", new NameValueEntry[2] {new NameValueEntry("namespace", "testNamespace"),
-                        new NameValueEntry("key", "testKey")}))
+                new RedisStreamBatchContainer(new StreamEntry("1-0", [
+                    new("namespace", "testNamespace"),
+                    new("key", "testKey"),
+                    new("eventType", "testEventType" ),
+                    new( "data", "testData" )
+                ])),
+                new RedisStreamBatchContainer(new StreamEntry("2-0", [
+                    new("namespace", "testNamespace"),
+                    new("key", "testKey"),
+                    new("eventType", "testEventType" ),
+                    new( "data", "testData" )
+                ]))
             };
-            _mockDatabase.Setup(db => db.StreamAcknowledgeAsync(It.IsAny<RedisKey>(), It.IsAny<RedisValue>(), It.IsAny<RedisValue>(), CommandFlags.None))
-                         .ReturnsAsync(2);
+            _mockDatabase.Setup(db => db.StreamAcknowledgeAsync(It.IsAny<RedisKey>(), It.IsAny<RedisValue>(),
+                    It.IsAny<RedisValue>(), CommandFlags.None))
+                .ReturnsAsync(2);
 
             // Act
             await _receiver.MessagesDeliveredAsync(messages);
 
             // Assert
-            _mockDatabase.Verify(db => db.StreamAcknowledgeAsync(_queueId.ToString(), "consumer", "1-0", CommandFlags.None), Times.Once);
-            _mockDatabase.Verify(db => db.StreamAcknowledgeAsync(_queueId.ToString(), "consumer", "2-0", CommandFlags.None), Times.Once);
+            _mockDatabase.Verify(
+                db => db.StreamAcknowledgeAsync(_queueId.ToString(), "consumer", "1-0", CommandFlags.None), Times.Once);
+            _mockDatabase.Verify(
+                db => db.StreamAcknowledgeAsync(_queueId.ToString(), "consumer", "2-0", CommandFlags.None), Times.Once);
         }
 
         [Fact]
@@ -86,8 +108,9 @@ namespace RedisStreamsProvider.UnitTests
         {
             // Arrange
             var tcs = new TaskCompletionSource<StreamEntry[]>();
-            _mockDatabase.Setup(db => db.StreamReadGroupAsync(It.IsAny<RedisKey>(), It.IsAny<RedisValue>(), It.IsAny<RedisValue>(), It.IsAny<RedisValue>(), It.IsAny<int>(), CommandFlags.None))
-                         .Returns(tcs.Task);
+            _mockDatabase.Setup(db => db.StreamReadGroupAsync(It.IsAny<RedisKey>(), It.IsAny<RedisValue>(),
+                    It.IsAny<RedisValue>(), It.IsAny<RedisValue>(), It.IsAny<int>(), CommandFlags.None))
+                .Returns(tcs.Task);
 
             // Act
             var getMessagesTask = _receiver.GetQueueMessagesAsync(10);

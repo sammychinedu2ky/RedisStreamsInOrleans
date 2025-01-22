@@ -66,6 +66,11 @@ public class NumberGeneratorGrain : Grain, INumberGeneratorGrain, IAsyncObserver
         _logger.LogInformation("Received number {Number}", item);
         await Task.Delay(2000);
 
+        var newStreamId = StreamId.Create("numbergenerator", "consecutive-back");
+        var newStream = this.GetStreamProvider("RedisStream").GetStream<int>(newStreamId);
+        _logger.LogInformation("Sending number {Number} to new stream", item);
+        await newStream.OnNextAsync(item);
+        
     }
 }
 
