@@ -8,6 +8,7 @@ using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
+using Nuke.Common.Tools.Git;
 using Nuke.Common.Tools.GitVersion;
 using Nuke.Common.Utilities.Collections;
 using static Nuke.Common.EnvironmentInfo;
@@ -23,7 +24,6 @@ class Build : NukeBuild
 
     public static int Main() => Execute<Build>(x => x.Pack);
 
-    private const string NuGetSourceUrl = "https://api.nuget.org/v3/index.json";
     private const string LibraryProjectName = "Universley.OrleansContrib.StreamsProvider.Redis";
 
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
@@ -42,6 +42,9 @@ class Build : NukeBuild
     // Nuget API key can be also set as an environment variable
     [Parameter("NuGet API key")]
     readonly string NuGetApiKey;
+
+    [Parameter("Gitea Nuget package source name")]
+    readonly string GiteaNugetSourceName = Environment.GetEnvironmentVariable("GITEA_NUGET_SOURCE_NAME");
 
     Target Clean => _ => _
         .Before(Restore)
@@ -106,14 +109,21 @@ class Build : NukeBuild
             .Executes(() =>
             {
                 DotNetTasks.DotNetNuGetPush(s => s
-                    .SetSource(NuGetSourceUrl)
+                    .SetSource(GiteaNugetSourceName)
                     .SetApiKey(NuGetApiKey)
                     .SetTargetPath(NuGetPackagesDirectory / $"{LibraryProjectName}.{GitVersion.NuGetVersionV2}.snupkg"));
 
                 DotNetTasks.DotNetNuGetPush(s => s
-                     .SetSource(NuGetSourceUrl)
-                     .SetApiKey(NuGetApiKey)
+                     .SetSource(GiteaNugetSourceName)
                      .SetTargetPath(NuGetPackagesDirectory / $"{LibraryProjectName}.{GitVersion.NuGetVersionV2}.nupkg"));
             });
 
+    Target CreateAndPushGitTag => _ => _
+        .Executes(() =>
+        {
+            var gitTag = $"{GitVersion.NuGetVersionV2}";
+            GitTasks.Git($"tag {gitTag}");
+            GitTasks.Git($"push origin {gitTag}");
+        });
+}
 }
