@@ -16,8 +16,8 @@ namespace Provider
         public RedisStreamReceiver(QueueId queueId, IDatabase database, ILogger<RedisStreamReceiver> logger)
         {
             _queueId = queueId;
-            _database = database;
-            _logger = logger;
+            _database = database ?? throw new ArgumentNullException(nameof(database));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<IList<IBatchContainer>?> GetQueueMessagesAsync(int maxCount)
@@ -69,7 +69,7 @@ namespace Provider
                     var container = message as RedisStreamBatchContainer;
                     if (container != null)
                     {
-                        var ack = _database.StreamAcknowledgeAsync(_queueId.ToString(), "consumer", container.StreamEntry.Id);
+                        var ack = _database.StreamAcknowledgeAsync(_queueId.ToString(), "consumer", container.StreamEntryId);
                         pendingTasks = ack;
                         await ack;
                     }

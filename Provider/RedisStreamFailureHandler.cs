@@ -10,7 +10,7 @@ namespace Provider
 
         public RedisStreamFailureHandler(ILogger<RedisStreamFailureHandler> logger)
         {
-            _logger = logger;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public bool ShouldFaultSubsriptionOnError => true;
